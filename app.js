@@ -1,13 +1,19 @@
 let express = require("express");
+const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
 let cors = require("cors");
 let app = express();
-const fs = require('fs');
+const fs = require("fs");
 const yaml = require("js-yaml");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
 
 const port = 2020;
 
@@ -15,22 +21,54 @@ app.get("/", (request, response) => {
   response.send("IEA backend running");
 });
 
-app.get("/getdata", async (request, response) => {
-  console.log("getting data");
+app.get("/get-data", async (request, response) => {
   let data;
   try {
-    let fileContents = fs.readFileSync("./data.yaml", "utf8");
+    let fileContents = fs.readFileSync("./uploads/data.yaml", "utf8");
     data = yaml.safeLoad(fileContents);
   } catch (e) {
     console.log(e);
     data = {
-      content: 'bs data'
-    }
+      content: "bs data",
+    };
   }
 
   response.writeHead(200, { "Content-Type": "application/json" });
   response.write(JSON.stringify(data));
   response.end();
+});
+
+app.post("/upload-data", async (req, res) => {
+  console.log("uploading data");
+  try {
+    if (!req.files) {
+      res.send({
+        status: false,
+        message: "No file uploaded",
+      });
+    } else {
+      //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+      let data_file = req.files.data_file;
+      console.log("received file", data_file.name);
+
+      //Use the mv() method to place the file in upload directory (i.e. "uploads")
+      data_file.mv("./uploads/data.yaml");
+
+      //send response
+      res.send({
+        status: true,
+        message: "File is uploaded",
+        data: {
+          name: data_file.name,
+          mimetype: data_file.mimetype,
+          size: data_file.size
+        },
+      });
+    }
+  } catch (err) {
+    console.log("something went wrong");
+    res.status(500).send(err);
+  }
 });
 
 app.listen(port, function () {
