@@ -47,7 +47,7 @@ app.post("/upload-data", async (req, res) => {
         message: "No file uploaded",
       });
     } else {
-      //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+      //Use the name of the input field (i.e. "data_file") to retrieve the uploaded file
       let data_file = req.files.data_file;
       console.log("received file", data_file.name);
 
