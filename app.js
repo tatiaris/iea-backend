@@ -15,8 +15,6 @@ app.use(
   })
 );
 
-const port = 2020;
-
 app.get("/", (request, response) => {
   response.send("IEA backend running");
 });
@@ -29,7 +27,7 @@ app.get("/get-data", async (request, response) => {
   } catch (e) {
     console.log(e);
     data = {
-      content: "bs data",
+      content: "err data",
     };
   }
 
@@ -47,14 +45,9 @@ app.post("/upload-data", async (req, res) => {
         message: "No file uploaded",
       });
     } else {
-      //Use the name of the input field (i.e. "data_file") to retrieve the uploaded file
       let data_file = req.files.data_file;
       console.log("received file", data_file.name);
-
-      //Use the mv() method to place the file in upload directory (i.e. "uploads")
       data_file.mv("./uploads/data.yaml");
-
-      //send response
       res.send({
         status: true,
         message: "File is uploaded",
@@ -71,6 +64,4 @@ app.post("/upload-data", async (req, res) => {
   }
 });
 
-app.listen(port, function () {
-  console.log(`listening on port ${port}`);
-});
+app.listen(process.env.PORT || 2020);
