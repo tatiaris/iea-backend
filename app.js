@@ -26,21 +26,21 @@ const clean_data = (str) => {
   return str;
 }
 
-const send_yaml_data = async (f_name, response) => {
+const send_yaml_data = (f_name, response) => {
   const fileContents = fs.readFileSync(`./uploads/${f_name}`, "utf8");
   data = yaml.safeLoad(fileContents, response)
   response.writeHead(200, { "Content-Type": "application/json" });
   response.write(JSON.stringify(data));
   response.end();
 }
-const send_json_data = async (f_name, response) => {
+const send_json_data = (f_name, response) => {
   const fileContents = fs.readFileSync(`./uploads/${f_name}`, "utf8");
   data = JSON.parse(fileContents, response)
   response.writeHead(200, { "Content-Type": "application/json" });
   response.write(JSON.stringify(data));
   response.end();
 }
-const send_csv_data = async (f_name, response) => {
+const send_csv_data = (f_name, response) => {
   let obj_data = {
     observations: []
   }
@@ -134,6 +134,9 @@ app.get("/get-data", async (request, response) => {
     data = {
       content: "err data",
     };
+    response.writeHead(200, { "Content-Type": "application/json" });
+    response.write(JSON.stringify(data));
+    response.end();
   }
 });
 
